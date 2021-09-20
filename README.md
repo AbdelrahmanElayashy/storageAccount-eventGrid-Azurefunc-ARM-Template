@@ -1,0 +1,1 @@
+# storageAccount-eventGrid-Azurefunc-ARM-Template
