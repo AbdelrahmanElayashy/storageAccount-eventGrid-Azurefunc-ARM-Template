@@ -1,1 +1,1 @@
-![Deploy to Azure](https://aka.ms/deploytoazurebutton)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAbdelrahmanElayashy%2FstorageAccount-eventGrid-Azurefunc-ARM-Template%2Fmaster%2FstorageAccount-eventGrid%2Ftemplate1.json)
