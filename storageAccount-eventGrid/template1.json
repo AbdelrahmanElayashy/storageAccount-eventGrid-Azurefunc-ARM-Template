@@ -54,7 +54,7 @@
         "applicationInsightsName": "[parameters('appName')]",
         "functionWorkerRuntime": "[parameters('runtime')]",
         "repoUrl": "https://github.com/AbdelrahmanElayashy/counting-blobs-parallel-by-azurefunc.git",
-        "branch" : "master"
+        "branch": "master"
     },
     "resources": [
         {
@@ -148,9 +148,11 @@
                 "name": "Y1",
                 "tier": "Dynamic"
             },
+            "kind": "linux",
             "properties": {
                 "name": "[variables('hostingPlanName')]",
-                "computeMode": "Dynamic"
+                "computeMode": "Dynamic",
+                "reserved": true
             }
         },
         {
@@ -158,7 +160,7 @@
             "apiVersion": "2020-06-01",
             "name": "[variables('functionAppName')]",
             "location": "[parameters('location')]",
-            "kind": "functionapp",
+            "kind": "functionapp,linux",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('uniqueStorageName'))]"
@@ -166,14 +168,21 @@
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "siteConfig": {
+                    "linuxFxVersion": "PYTHON|3.9",
+                    "numberOfWorkers": 1,
+                    "acrUseManagedIdentityCreds": false,
+                    "alwaysOn": false,
+                    "http20Enabled": false,
+                    "functionAppScaleLimit": 1,
+                    "minimumElasticInstanceCount": 1,
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('uniqueStorageName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameTidy')), variables('storageAccountApiVersion')).keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('uniqueStorageName'),  ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameTidy')), variables('storageAccountApiVersion')).keys[0].value , ';EndpointSuffix=', environment().suffixes.storage)]"
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('uniqueStorageName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameTidy')), variables('storageAccountApiVersion')).keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('uniqueStorageName'),  ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameTidy')), variables('storageAccountApiVersion')).keys[0].value , ';EndpointSuffix=', environment().suffixes.storage)]"
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
@@ -194,6 +203,11 @@
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
                             "value": "[variables('functionWorkerRuntime')]"
+                        },
+                        {
+                            "name": "[concat(variables('uniqueStorageName'), '__STORAGE')]",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('uniqueStorageName'),  ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameTidy')), variables('storageAccountApiVersion')).keys[0].value , ';EndpointSuffix=', environment().suffixes.storage)]"
+
                         }
                     ]
                 }
